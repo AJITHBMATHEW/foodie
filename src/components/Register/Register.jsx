@@ -39,7 +39,7 @@ const Register = () => {
             errors.phone = 'Phone number is required!';
         } else if (values.phone.length < 10) {
             errors.phone = 'Phone number must be at least 10 digit!';
-        } else if (!/^\+?[0-9]{10,12}$/.test(values.phone)) {
+        } else if (!/^\+?[0-9]{10,13}$/.test(values.phone)) {
             errors.phone = 'Invalid phone number!';
         }
 

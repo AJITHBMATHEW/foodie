@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import userImg from '../../assets/images/user.svg';
 import './Login.css';
 import { postDoc } from '../../Services/httpServices';
 import Modal from '../Modal/Modal';
+import { UserDataContext } from '../../App';
 
 const Login = () => {
+    const [userData, setUserData]  = useContext(UserDataContext);
     const [success, setSuccess] = useState({ status: false, message: "" });
     const [showModal, setShowModal] = useState(false)
 
@@ -17,7 +19,7 @@ const Login = () => {
             errors.phone = 'Phone number is required!';
         } else if (values.phone.length < 10) {
             errors.phone = 'Phone number must be at least 10 digit!';
-        } else if (!/^\+?[0-9]{10,12}$/.test(values.phone)) {
+        } else if (!/^\+?[0-9]{10,13}$/.test(values.phone)) {
             errors.phone = 'Invalid phone number!';
         }
 
@@ -39,8 +41,13 @@ const Login = () => {
         onSubmit: values => {
             postDoc('user/login','',{...values,deviceId:"device-id",deviceType:"chrome"})
             .then(data=>{
+                console.log({...values,deviceId:"device-id",deviceType:"chrome"})
                 setSuccess({status:data.status,message:data.message});
                 setShowModal(true);
+                if (data.status) {
+                    setUserData(data)
+                    console.log(data);
+                }
             })
         },
     });

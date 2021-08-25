@@ -9,36 +9,42 @@ import ViewProduct from './components/ViewProduct/ViewProduct';
 import AllProducts from './components/AllProducts/AllProducts';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer/Footer';
+import { createContext, useState } from 'react';
+
+export const UserDataContext = createContext();
 
 function App() {
+  const [userData, setUserData] = useState({})
   return (
-    <Router>
-      <Switch>
-        <Route path="/login">
-          <Login />
-        </Route>
-        <Route path="/register">
-          <Register />
-        </Route>
-        <Route path="/forget-password">
-          <RecoverPassword />
-        </Route>
-        <Route path="/products">
-          <Navbar/>
-          <AllProducts />
-          <Footer/>
-        </Route>
-        <Route path="/product/:productId">
-          <ViewProduct />
-        </Route>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route path="*">
-          <NotFound />
-        </Route>
-      </Switch>
-    </Router>
+    <UserDataContext.Provider value={[userData, setUserData]}>
+      <Router>
+        <Switch>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/register">
+            <Register />
+          </Route>
+          <Route path="/forget-password">
+            <RecoverPassword />
+          </Route>
+          <Route path="/products">
+            <Navbar />
+            <AllProducts />
+            <Footer />
+          </Route>
+          <Route path="/product/:productId">
+            <ViewProduct />
+          </Route>
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route path="*">
+            <NotFound />
+          </Route>
+        </Switch>
+      </Router>
+    </UserDataContext.Provider>
   );
 }
 

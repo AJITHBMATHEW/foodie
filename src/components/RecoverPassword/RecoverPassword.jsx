@@ -6,23 +6,13 @@ import { postDoc } from '../../Services/httpServices';
 import Modal from '../Modal/Modal';
 
 const RecoverPassword = () => {
+    const [phone, setPhone] = useState('')
+    const [passwords, setPasswords] = useState({ password: '', rePassword: '' })
     const [OTP, setOTP] = useState('');
-    const [timer, setTimer] = useState(0);
     const [success, setSuccess] = useState({ status: false, message: "" });
     const [showModal, setShowModal] = useState(false);
     const [steps, setSteps] = useState({ first: false, second: false, third: false })
 
-
-    useEffect(() => {
-        let myInterval = setInterval(() => {
-            if (timer > 0) {
-                setTimer(timer - 1);
-            }
-        }, 1000)
-        return () => {
-            clearInterval(myInterval);
-        };
-    });
 
     const validate = values => {
         const errors = {};
@@ -31,7 +21,7 @@ const RecoverPassword = () => {
             errors.phone = 'Phone number is required!';
         } else if (values.phone.length < 10) {
             errors.phone = 'Phone number must be at least 10 digit!';
-        } else if (!/^\+?[0-9]{10,12}$/.test(values.phone)) {
+        } else if (!/^\+?[0-9]{10,13}$/.test(values.phone)) {
             errors.phone = 'Invalid phone number!';
         }
 
@@ -44,11 +34,16 @@ const RecoverPassword = () => {
         },
         validate,
         onSubmit: values => {
-            postDoc('user/forgot-password/1', '', values)
+            postDoc('user/forgot-password/1', '', {...values, type: "forgot-password"})
                 .then(data => {
-                    setSuccess({ status: data.status, message: data.message });
-                    setSteps({ ...steps, first: true })
-                    setTimer(10)
+                    console.log({...values, type: "forgot-password"})
+                    if (!data.status) {
+                        setShowModal(true)
+                        setSuccess({ status: data.status, message: data.message });
+                    } else if (data.status) {
+                        setSteps({ ...steps, first: true })
+                        setPhone(values.phone)
+                    }
                 })
         },
     });
@@ -56,32 +51,49 @@ const RecoverPassword = () => {
 
 
     const handleOnChange = (e) => {
-        setOTP(e.target.value)
+        if (e.target.name === 'otp') {
+            setOTP(e.target.value)
+        }
+        if (e.target.name === 'password') {
+            setPasswords({ ...passwords, [e.target.name]: e.target.value })
+        }
+        if (e.target.name === 'rePassword') {
+            setPasswords({ ...passwords, [e.target.name]: e.target.value })
+        }
     }
 
-    const sendOTP = (phone) => {
-        postDoc('user/generate-otp', '', { phone: phone, type: "verification" })
+    const handleVerifyOTP = () => {
+        postDoc('user/forgot-password/2', '', { phone:phone, type: "forgot-password", otp: OTP })
             .then(data => {
                 console.log(data);
-            })
-    }
-
-    const reSendOTP = () => {
-        setTimer(10);
-        postDoc('user/resend-otp', '', { phone: formik.phone, type: "verification" })
-            .then(data => {
-                console.log(data);
-            })
-    }
-
-    const handleSubmitOTP = () => {
-        if (/^[0-9]{4}$/.test(OTP) && formik.phone) {
-            postDoc('user/register', '', { ...formik.phone, otp: OTP, type: "verification" })
-                .then(data => {
-                    console.log(data);
+                console.log({ phone, type: "forgot-password", otp: OTP })
+                if (!data.status) {
+                    setShowModal(true)
                     setSuccess({ status: data.status, message: data.message });
-                    setShowModal(true);
-                })
+                } else if (data.status) {
+                    setSteps({ ...steps, second: true })
+                }
+            })
+    }
+    const handleSetPassword = ()=>{
+        if(passwords.password !== passwords.rePassword){
+            setSuccess({ status: false, message: "New password & re-type password did not matched!" });
+            setShowModal(true)
+            console.log(passwords);
+        }else if(passwords.password === passwords.rePassword){
+            postDoc('user/forgot-password/3','',{phone,password:passwords.password,otp:OTP, type: "forgot-password"})
+            .then(data=>{
+                console.log(data);
+                console.log({phone,password:passwords.password,otp:OTP, type: "forgot-password"})
+                if (!data.status) {
+                    setShowModal(true)
+                    setSuccess({ status: data.status, message: data.message });
+                } else if (data.status) {
+                    setSteps({ ...steps, third: true })
+                    setSuccess({ status: data.status, message: data.message });
+                    setShowModal(true)
+                }
+            })
         }
     }
     return (
@@ -97,34 +109,55 @@ const RecoverPassword = () => {
                                 isSuccess={success.status}
                                 message={success.message}
                                 isLink={success.status}
-                                linkUrl="/profile"
+                                linkUrl="/login"
                                 isClose={!success.status}
                                 setShowModal={setShowModal} />
+                        }
+                        {
+                            steps.first && steps.second && !steps.third &&
+                            <div>
+                                <div class="input-wrapper mt-0 me-2">
+                                    <i class="fas fa-user-lock" aria-hidden="true"></i>
+                                    <input
+                                        type="text"
+                                        name="password"
+                                        placeholder="Enter your new password"
+                                        onChange={handleOnChange}
+                                    />
+                                </div>
+                                <div class="input-wrapper mt-0 me-2 mt-3">
+                                    <i class="fas fa-user-lock" aria-hidden="true"></i>
+                                    <input
+                                        type="text"
+                                        name="rePassword"
+                                        placeholder="Re type password"
+                                        onChange={handleOnChange}
+                                    />
+                                </div>
+                                <div class="text-center mt-3">
+                                    {
+                                        <input
+                                            type="submit"
+                                            value="Set password"
+                                            className="custom-btn"
+                                            onClick={handleSetPassword} />
+                                    }
+                                </div>
+                            </div>
+
                         }
                         {
                             steps.first && !steps.second && !steps.third &&
                             <div>
                                 <p><strong>An OTP has been send to your phone number via SMS. Enter the OTP & click the 'Submit OTP' Button.</strong></p>
-                                <div className="d-flex">
-                                    <div class="input-wrapper mt-0 me-2">
-                                        <i class="fas fa-sms" aria-hidden="true"></i>
-                                        <input
-                                            type="text"
-                                            name="otp"
-                                            placeholder="Enter OTP"
-                                            onChange={handleOnChange}
-                                        />
-                                    </div>
-                                    {
-                                        timer > 0 ?
-                                            <button
-                                                className="custom-btn disabled"
-                                                style={{ width: "120px" }}>Resend({timer})</button> :
-                                            <button
-                                                className="custom-btn"
-                                                onClick={reSendOTP}
-                                                style={{ width: "120px" }}>Resend</button>
-                                    }
+                                <div class="input-wrapper mt-0 me-2">
+                                    <i class="fas fa-sms" aria-hidden="true"></i>
+                                    <input
+                                        type="text"
+                                        name="otp"
+                                        placeholder="Enter OTP"
+                                        onChange={handleOnChange}
+                                    />
                                 </div>
                                 {
                                     !/^[0-9]{4}$/.test(OTP) && OTP.length > 0 &&
@@ -137,7 +170,7 @@ const RecoverPassword = () => {
                                                 type="submit"
                                                 value="Submit OTP"
                                                 className="custom-btn"
-                                                onClick={handleSubmitOTP} /> :
+                                                onClick={handleVerifyOTP} /> :
                                             <input
                                                 type="submit"
                                                 value="Submit OTP"
@@ -176,7 +209,7 @@ const RecoverPassword = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
