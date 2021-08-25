@@ -1,0 +1,17 @@
+.navbar-brand{
+    font-weight: bold;  
+    color: #01c78f!important;
+}
+.nav-item{
+    font-weight: 500;
+}
+.nav-btn{
+    border: 0;
+    outline: 0;
+    padding: 5px;
+    font-weight: 500;
+    color: #fff!important;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #00f091 0%, #00a2fa 100%);
+    transition: all .3s ease;
+}

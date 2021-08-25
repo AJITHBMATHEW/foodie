@@ -1,0 +1,15 @@
+.custom-box{
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 0 6px rgb(238, 237, 237);
+    border-radius: 5px;
+    padding: 5px;
+}
+.thumbnail-picker{
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    margin: auto 5px;
+    padding: 3px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}

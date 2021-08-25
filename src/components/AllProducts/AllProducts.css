@@ -1,0 +1,40 @@
+.section-title{
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    font-size: 35px;
+    padding: 15px 0;
+    color: #363958;
+}
+.card,.card-footer{
+    border: none;
+    background: none;
+}
+.card{
+    border-radius: 20px;
+}
+.product-img{
+    border: 1px solid #f1f1f1;
+    box-shadow: 0 0 10px rgb(238, 237, 237);
+    border-radius: 15px;
+    padding: 5px;
+    text-align: center;
+}
+.product-img img{
+    width: fit-content;
+    height: 200px;
+}
+.card-body h5{
+    font-weight: 700;
+    padding: 10px;
+}
+.card-body p{
+    padding: 0 10px;
+}
+.card-footer{
+    padding: 20px 25px 30px 25px;
+}
+.card-footer .price{
+    color: #FABE4C;
+    font-weight: 700;
+}

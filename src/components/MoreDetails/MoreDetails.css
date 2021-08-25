@@ -1,0 +1,25 @@
+.more-details{
+    padding: 30px 0 50px 0;
+}
+.more-details .details{
+    padding: 15px 30px;
+}
+.more-details .details-img{
+    width: 80px;
+}
+.more-details .details-img img{
+    width: 100%;
+}
+.more-details .details-text{
+    margin-left: 25px;
+}
+.more-details .details-text h3{
+    font-weight: 700;
+    font-size: 25px;
+}
+.more-details .details-text p{
+    font-weight: 500;
+}
+.shopping-img{
+    padding: 30px;
+}
